@@ -2,6 +2,7 @@
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 var saveButton = $(".saveBtn");
+var currentTime = dayjs().hour(); // sets currentTime to 24 hour clock
 
 $(function () {
   // TODO: Add a listener for click events on the save button. This code should
@@ -12,8 +13,11 @@ $(function () {
   // useful when saving the description in local storage?
   saveButton.on("click", function (e) {
     var hourBlock = e.target.parentNode.id;
-    var hourId = "#" + hourBlock;
-    var toDoInput = $(hourId).children(1).eq(1).val();
+
+    var toDoInput = $("#" + hourBlock)
+      .children(1)
+      .eq(1)
+      .val();
 
     localStorage.setItem(hourBlock, toDoInput);
   });
@@ -23,10 +27,40 @@ $(function () {
   // attribute of each time-block be used to conditionally add or remove the
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
-  //
+  $(".container-lg")
+    .find("div")
+    .each(function () {
+      var timeBlock = $(this).attr("id");
+
+      if (
+        timeBlock < "hour-" + currentTime &&
+        $(this).attr("class") == "row time-block"
+      ) {
+        $(this).addClass("past");
+      } else if (
+        timeBlock == "hour-" + currentTime &&
+        $(this).attr("class") == "row time-block"
+      ) {
+        $(this).addClass("present");
+      } else if (
+        timeBlock > "hour-" + currentTime &&
+        $(this).attr("class") == "row time-block"
+      ) {
+        $(this).addClass("future");
+      }
+    });
+
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
-  //
+  for (var i = 9; i < 18; i++) {
+    var hourId = "hour-" + i;
+    var timeEl = $("#" + hourId);
+    var newText = localStorage.getItem(hourId);
+
+    timeEl.children(1).val(newText);
+  }
+
   // TODO: Add code to display the current date in the header of the page.
+  $("#currentDay").text(dayjs().format("MMM D, YYYY"));
 });
